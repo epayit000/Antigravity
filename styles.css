@@ -22,9 +22,9 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 28px;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
-  --shadow-lg: 0 16px 64px rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 40px var(--color-primary-glow);
   --transition-fast: 150ms ease;
   --transition-normal: 300ms ease;
@@ -32,13 +32,16 @@
 }
 
 /* ===== Reset & Base ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -135,14 +138,16 @@ html, body {
   transition: opacity var(--transition-normal);
 }
 
-.drop-zone:hover, .drop-zone.drag-over {
+.drop-zone:hover,
+.drop-zone.drag-over {
   border-color: var(--color-primary);
   background: var(--color-surface-2);
   transform: translateY(-2px);
   box-shadow: var(--shadow-glow);
 }
 
-.drop-zone:hover::before, .drop-zone.drag-over::before {
+.drop-zone:hover::before,
+.drop-zone.drag-over::before {
   opacity: 1;
 }
 
@@ -368,13 +373,15 @@ html, body {
   z-index: 2;
 }
 
-.slide img, .slide canvas {
+.slide img,
+.slide canvas {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
 }
 
-.slide.fit-cover img, .slide.fit-cover canvas {
+.slide.fit-cover img,
+.slide.fit-cover canvas {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -425,7 +432,7 @@ html, body {
   left: 0;
   right: 0;
   height: 3px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   z-index: 100;
 }
 
@@ -443,7 +450,7 @@ html, body {
   right: 24px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255, 255, 255, 0.3);
   z-index: 100;
   letter-spacing: 0.05em;
   transition: opacity var(--transition-normal);
@@ -532,7 +539,9 @@ html, body {
 }
 
 .settings-panel.hidden {
-  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .settings-header {
@@ -621,7 +630,8 @@ select {
   transition: border-color var(--transition-fast);
 }
 
-select:hover, select:focus {
+select:hover,
+select:focus {
   border-color: var(--color-primary);
 }
 
@@ -666,55 +676,146 @@ select:hover, select:focus {
 
 /* ===== Animations ===== */
 @keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(1.3); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
 }
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(40px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes toastOut {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(40px); }
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Transition types for slides */
-.slide.transition-fade        { transition: opacity 0.8s ease; }
-.slide.transition-slide-left  { transition: opacity 0.8s ease, transform 0.8s ease; }
-.slide.transition-slide-up    { transition: opacity 0.8s ease, transform 0.8s ease; }
-.slide.transition-zoom        { transition: opacity 0.8s ease, transform 0.8s ease; }
-.slide.transition-none        { transition: none; }
+.slide.transition-fade {
+  transition: opacity 0.8s ease;
+}
 
-.slide.transition-slide-left:not(.active) { transform: translateX(100%); }
-.slide.transition-slide-up:not(.active)   { transform: translateY(100%); }
-.slide.transition-zoom:not(.active)       { transform: scale(0.8); }
+.slide.transition-slide-left {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
 
-.slide.exit-slide-left  { transform: translateX(-100%) !important; opacity: 0 !important; }
-.slide.exit-slide-up    { transform: translateY(-100%) !important; opacity: 0 !important; }
-.slide.exit-zoom        { transform: scale(1.2) !important; opacity: 0 !important; }
+.slide.transition-slide-up {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide.transition-zoom {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide.transition-none {
+  transition: none;
+}
+
+.slide.transition-slide-left:not(.active) {
+  transform: translateX(100%);
+}
+
+.slide.transition-slide-up:not(.active) {
+  transform: translateY(100%);
+}
+
+.slide.transition-zoom:not(.active) {
+  transform: scale(0.8);
+}
+
+.slide.exit-slide-left {
+  transform: translateX(-100%) !important;
+  opacity: 0 !important;
+}
+
+.slide.exit-slide-up {
+  transform: translateY(-100%) !important;
+  opacity: 0 !important;
+}
+
+.slide.exit-zoom {
+  transform: scale(1.2) !important;
+  opacity: 0 !important;
+}
 
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
-  .upload-container { padding: 24px 16px; gap: 24px; }
-  .brand h1 { font-size: 2rem; }
-  .drop-zone { padding: 32px 20px; }
-  .existing-actions { flex-direction: column; }
-  .btn { width: 100%; justify-content: center; }
-  .settings-panel { width: 95vw; }
+  .upload-container {
+    padding: 24px 16px;
+    gap: 24px;
+  }
+
+  .brand h1 {
+    font-size: 2rem;
+  }
+
+  .drop-zone {
+    padding: 32px 20px;
+  }
+
+  .existing-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .settings-panel {
+    width: 95vw;
+  }
 }

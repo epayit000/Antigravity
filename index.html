@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Kiosk PowerPoint Slide Display — upload and continuously display your presentation slides." />
+  <meta name="description"
+    content="Kiosk PowerPoint Slide Display — upload and continuously display your presentation slides." />
   <title>SlideKiosk — Continuous Presentation Display</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <!-- ===== Upload Screen ===== -->
   <div id="upload-screen" class="screen active">
@@ -17,11 +21,11 @@
       <div class="brand">
         <div class="brand-icon">
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="8" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2.5"/>
-            <rect x="10" y="14" width="16" height="10" rx="2" fill="currentColor" opacity="0.3"/>
-            <line x1="10" y1="28" x2="38" y2="28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <line x1="10" y1="33" x2="28" y2="33" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="35" cy="18" r="4" fill="currentColor" opacity="0.5"/>
+            <rect x="4" y="8" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2.5" />
+            <rect x="10" y="14" width="16" height="10" rx="2" fill="currentColor" opacity="0.3" />
+            <line x1="10" y1="28" x2="38" y2="28" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="10" y1="33" x2="28" y2="33" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <circle cx="35" cy="18" r="4" fill="currentColor" opacity="0.5" />
           </svg>
         </div>
         <h1>SlideKiosk</h1>
@@ -32,14 +36,19 @@
         <div class="drop-zone-content">
           <div class="upload-icon">
             <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32 44V20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              <path d="M22 28L32 18L42 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 40C12 46.627 17.373 52 24 52H40C46.627 52 52 46.627 52 40C52 34.894 48.78 30.536 44.25 28.874" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              <path d="M44.25 28.874C43.478 22.046 37.84 16.75 31 16.75C24.72 16.75 19.45 21.242 18.093 27.238" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              <path d="M18.093 27.238C14.55 28.3 12 31.578 12 35.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <path d="M32 44V20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              <path d="M22 28L32 18L42 28" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path
+                d="M12 40C12 46.627 17.373 52 24 52H40C46.627 52 52 46.627 52 40C52 34.894 48.78 30.536 44.25 28.874"
+                stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              <path d="M44.25 28.874C43.478 22.046 37.84 16.75 31 16.75C24.72 16.75 19.45 21.242 18.093 27.238"
+                stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              <path d="M18.093 27.238C14.55 28.3 12 31.578 12 35.5" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" />
             </svg>
           </div>
-          <p class="drop-text">Drag & drop your PowerPoint file here</p>
+          <p class="drop-text" id="drop-text-main">Drag & drop your PowerPoint file here</p>
           <p class="drop-subtext">or click to browse</p>
           <div class="supported-formats">
             <span class="format-badge">.PPTX</span>
@@ -71,15 +80,25 @@
         </div>
         <div class="existing-actions">
           <button id="btn-play-existing" class="btn btn-primary">
-            <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+              <path d="M8 5v14l11-7z" fill="currentColor" />
+            </svg>
             Play Slideshow
           </button>
           <button id="btn-replace" class="btn btn-ghost">
-            <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+              <path
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
             Replace
           </button>
           <button id="btn-clear" class="btn btn-ghost btn-danger">
-            <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+              <path
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
             Clear All
           </button>
         </div>
@@ -108,24 +127,47 @@
     <div id="controls-overlay" class="controls-overlay">
       <div class="controls-bar">
         <button id="btn-prev" class="control-btn" title="Previous Slide">
-          <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
         </button>
         <button id="btn-pause" class="control-btn" title="Pause/Play">
-          <svg id="icon-pause" viewBox="0 0 24 24" fill="none" width="24" height="24"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>
-          <svg id="icon-play" viewBox="0 0 24 24" fill="none" width="24" height="24" class="hidden"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+          <svg id="icon-pause" viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor" />
+            <rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor" />
+          </svg>
+          <svg id="icon-play" viewBox="0 0 24 24" fill="none" width="24" height="24" class="hidden">
+            <path d="M8 5v14l11-7z" fill="currentColor" />
+          </svg>
         </button>
         <button id="btn-next" class="control-btn" title="Next Slide">
-          <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
         </button>
         <div class="control-separator"></div>
         <button id="btn-fullscreen" class="control-btn" title="Fullscreen">
-          <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </button>
         <button id="btn-settings" class="control-btn" title="Settings">
-          <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2" />
+            <path
+              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </button>
         <button id="btn-back" class="control-btn" title="Back to Upload">
-          <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </button>
       </div>
     </div>
@@ -135,7 +177,9 @@
       <div class="settings-header">
         <h3>Settings</h3>
         <button id="btn-close-settings" class="control-btn">
-          <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
         </button>
       </div>
       <div class="settings-body">
@@ -195,8 +239,10 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+    onerror="document.getElementById('drop-text-main') && (document.getElementById('drop-text-main').textContent='Error: JSZip library failed to load. Check your internet connection.')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+    onerror="console.warn('PDF.js failed to load')"></script>
   <script>
     if (typeof pdfjsLib !== 'undefined') {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -204,4 +250,5 @@
   </script>
   <script src="app.js"></script>
 </body>
+
 </html>

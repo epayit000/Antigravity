@@ -31,44 +31,44 @@ const state = {
 const dom = {};
 
 function cacheDom() {
-  dom.uploadScreen     = document.getElementById('upload-screen');
-  dom.slideshowScreen  = document.getElementById('slideshow-screen');
-  dom.dropZone         = document.getElementById('drop-zone');
-  dom.fileInput        = document.getElementById('file-input');
-  dom.uploadProgress   = document.getElementById('upload-progress');
+  dom.uploadScreen = document.getElementById('upload-screen');
+  dom.slideshowScreen = document.getElementById('slideshow-screen');
+  dom.dropZone = document.getElementById('drop-zone');
+  dom.fileInput = document.getElementById('file-input');
+  dom.uploadProgress = document.getElementById('upload-progress');
   dom.progressFilename = document.getElementById('progress-filename');
-  dom.progressPercent  = document.getElementById('progress-percent');
-  dom.progressFill     = document.getElementById('progress-fill');
-  dom.progressStatus   = document.getElementById('progress-status');
-  dom.existingSlides   = document.getElementById('existing-slides');
-  dom.existingCount    = document.getElementById('existing-count');
-  dom.btnPlayExisting  = document.getElementById('btn-play-existing');
-  dom.btnReplace       = document.getElementById('btn-replace');
-  dom.btnClear         = document.getElementById('btn-clear');
-  dom.slideContainer   = document.getElementById('slide-container');
-  dom.slideCurrent     = document.getElementById('slide-current');
-  dom.slideNext        = document.getElementById('slide-next');
-  dom.progressBar      = document.getElementById('slide-progress-fill');
-  dom.currentNum       = document.getElementById('current-slide-num');
-  dom.totalNum         = document.getElementById('total-slides-num');
-  dom.controlsOverlay  = document.getElementById('controls-overlay');
-  dom.btnPrev          = document.getElementById('btn-prev');
-  dom.btnPause         = document.getElementById('btn-pause');
-  dom.btnNext          = document.getElementById('btn-next');
-  dom.btnFullscreen    = document.getElementById('btn-fullscreen');
-  dom.btnSettings      = document.getElementById('btn-settings');
-  dom.btnBack          = document.getElementById('btn-back');
-  dom.iconPause        = document.getElementById('icon-pause');
-  dom.iconPlay         = document.getElementById('icon-play');
-  dom.settingsPanel    = document.getElementById('settings-panel');
+  dom.progressPercent = document.getElementById('progress-percent');
+  dom.progressFill = document.getElementById('progress-fill');
+  dom.progressStatus = document.getElementById('progress-status');
+  dom.existingSlides = document.getElementById('existing-slides');
+  dom.existingCount = document.getElementById('existing-count');
+  dom.btnPlayExisting = document.getElementById('btn-play-existing');
+  dom.btnReplace = document.getElementById('btn-replace');
+  dom.btnClear = document.getElementById('btn-clear');
+  dom.slideContainer = document.getElementById('slide-container');
+  dom.slideCurrent = document.getElementById('slide-current');
+  dom.slideNext = document.getElementById('slide-next');
+  dom.progressBar = document.getElementById('slide-progress-fill');
+  dom.currentNum = document.getElementById('current-slide-num');
+  dom.totalNum = document.getElementById('total-slides-num');
+  dom.controlsOverlay = document.getElementById('controls-overlay');
+  dom.btnPrev = document.getElementById('btn-prev');
+  dom.btnPause = document.getElementById('btn-pause');
+  dom.btnNext = document.getElementById('btn-next');
+  dom.btnFullscreen = document.getElementById('btn-fullscreen');
+  dom.btnSettings = document.getElementById('btn-settings');
+  dom.btnBack = document.getElementById('btn-back');
+  dom.iconPause = document.getElementById('icon-pause');
+  dom.iconPlay = document.getElementById('icon-play');
+  dom.settingsPanel = document.getElementById('settings-panel');
   dom.btnCloseSettings = document.getElementById('btn-close-settings');
-  dom.slideDuration    = document.getElementById('slide-duration');
-  dom.durationValue    = document.getElementById('duration-value');
-  dom.transitionType   = document.getElementById('transition-type');
-  dom.transitionSpeed  = document.getElementById('transition-speed');
-  dom.speedValue       = document.getElementById('speed-value');
-  dom.bgColor          = document.getElementById('bg-color');
-  dom.fitMode          = document.getElementById('fit-mode');
+  dom.slideDuration = document.getElementById('slide-duration');
+  dom.durationValue = document.getElementById('duration-value');
+  dom.transitionType = document.getElementById('transition-type');
+  dom.transitionSpeed = document.getElementById('transition-speed');
+  dom.speedValue = document.getElementById('speed-value');
+  dom.bgColor = document.getElementById('bg-color');
+  dom.fitMode = document.getElementById('fit-mode');
 }
 
 // ===== IndexedDB =====
@@ -206,45 +206,75 @@ async function handleFiles(files) {
 
 // ===== PPTX Parser =====
 async function parsePPTX(file) {
+  if (typeof JSZip === 'undefined') {
+    showToast('JSZip library not loaded. Please check your internet connection.', 'error');
+    return [];
+  }
+
   updateProgress(10, 'Reading PPTX file…');
   const arrayBuffer = await file.arrayBuffer();
-  const zip = await JSZip.loadAsync(arrayBuffer);
 
-  updateProgress(25, 'Extracting slides…');
+  let zip;
+  try {
+    zip = await JSZip.loadAsync(arrayBuffer);
+  } catch (e) {
+    showToast('Invalid PPTX file — could not read as ZIP archive.', 'error');
+    console.error('JSZip error:', e);
+    return [];
+  }
+
+  updateProgress(20, 'Extracting slides…');
 
   // Get slide order from presentation.xml
   const slideOrder = await getSlideOrder(zip);
+  if (slideOrder.length === 0) {
+    showToast('No slides found in this PPTX file.', 'error');
+    return [];
+  }
+
   const slides = [];
 
-  // Extract slide relationships and images
+  // Extract all media files (images) from ppt/media/
   const mediaFiles = {};
   for (const [path, zipEntry] of Object.entries(zip.files)) {
     if (path.startsWith('ppt/media/') && !zipEntry.dir) {
-      const blob = await zipEntry.async('blob');
-      const url = URL.createObjectURL(blob);
-      const name = path.split('/').pop();
-      mediaFiles[name] = url;
+      try {
+        const blob = await zipEntry.async('blob');
+        const url = URL.createObjectURL(blob);
+        const name = path.split('/').pop();
+        mediaFiles[name] = url;
+      } catch (e) {
+        console.warn('Could not extract media file:', path, e);
+      }
     }
   }
 
   // Process each slide
   for (let i = 0; i < slideOrder.length; i++) {
     const slideFile = slideOrder[i];
-    const progress = 25 + (i / slideOrder.length) * 55;
+    const progress = 20 + (i / slideOrder.length) * 65;
     updateProgress(progress, `Processing slide ${i + 1} of ${slideOrder.length}…`);
 
-    const slideData = await extractSlideContent(zip, slideFile, mediaFiles);
-    if (slideData) {
-      slides.push(slideData);
+    try {
+      const slideData = await extractSlideContent(zip, slideFile, mediaFiles);
+      if (slideData) {
+        slides.push(slideData);
+      }
+    } catch (e) {
+      console.warn(`Could not process slide ${i + 1}:`, e);
     }
   }
 
-  // If no structured content was extractable, fall back to media images
+  // Fallback: if no slide content was extracted, use all media images as slides
   if (slides.length === 0 && Object.keys(mediaFiles).length > 0) {
     const sortedMedia = Object.entries(mediaFiles).sort((a, b) => a[0].localeCompare(b[0]));
     for (const [, url] of sortedMedia) {
-      const imgData = await blobUrlToDataUrl(url);
-      slides.push({ type: 'image', data: imgData });
+      try {
+        const imgData = await blobUrlToDataUrl(url);
+        slides.push({ type: 'image', data: imgData });
+      } catch (e) {
+        console.warn('Could not convert media to data URL:', e);
+      }
     }
   }
 
@@ -252,49 +282,8 @@ async function parsePPTX(file) {
 }
 
 async function getSlideOrder(zip) {
-  const presXml = zip.file('ppt/presentation.xml');
-  if (!presXml) return [];
-
-  const text = await presXml.async('text');
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(text, 'application/xml');
-
-  // Get relationship IDs from sldIdLst
-  const sldIdNodes = doc.querySelectorAll('sldId');
-  if (sldIdNodes.length === 0) {
-    // Fallback: find all slide files
-    const slideFiles = Object.keys(zip.files)
-      .filter(f => /^ppt\/slides\/slide\d+\.xml$/.test(f))
-      .sort((a, b) => {
-        const numA = parseInt(a.match(/slide(\d+)/)[1]);
-        const numB = parseInt(b.match(/slide(\d+)/)[1]);
-        return numA - numB;
-      });
-    return slideFiles;
-  }
-
-  // Parse relationships
-  const relsFile = zip.file('ppt/_rels/presentation.xml.rels');
-  if (!relsFile) return [];
-
-  const relsText = await relsFile.async('text');
-  const relsDoc = parser.parseFromString(relsText, 'application/xml');
-  const rels = {};
-  relsDoc.querySelectorAll('Relationship').forEach(rel => {
-    rels[rel.getAttribute('Id')] = rel.getAttribute('Target');
-  });
-
-  const slideFiles = [];
-  sldIdNodes.forEach(node => {
-    const rId = node.getAttribute('r:id') || node.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
-    if (rId && rels[rId]) {
-      const target = rels[rId];
-      const fullPath = target.startsWith('/') ? target.slice(1) : 'ppt/' + target;
-      slideFiles.push(fullPath);
-    }
-  });
-
-  if (slideFiles.length === 0) {
+  // Fallback function to find slides by filename pattern
+  function findSlidesByFilename() {
     return Object.keys(zip.files)
       .filter(f => /^ppt\/slides\/slide\d+\.xml$/.test(f))
       .sort((a, b) => {
@@ -304,7 +293,63 @@ async function getSlideOrder(zip) {
       });
   }
 
-  return slideFiles;
+  const presXml = zip.file('ppt/presentation.xml');
+  if (!presXml) return findSlidesByFilename();
+
+  try {
+    const text = await presXml.async('text');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'application/xml');
+
+    // Try to get sldId nodes (may be namespaced)
+    let sldIdNodes = doc.querySelectorAll('sldId');
+    if (sldIdNodes.length === 0) {
+      // Try with namespace
+      sldIdNodes = doc.getElementsByTagNameNS('*', 'sldId');
+    }
+
+    if (!sldIdNodes || sldIdNodes.length === 0) {
+      return findSlidesByFilename();
+    }
+
+    // Parse relationships file
+    const relsFile = zip.file('ppt/_rels/presentation.xml.rels');
+    if (!relsFile) return findSlidesByFilename();
+
+    const relsText = await relsFile.async('text');
+    const relsDoc = parser.parseFromString(relsText, 'application/xml');
+    const rels = {};
+    const relNodes = relsDoc.querySelectorAll('Relationship');
+    if (relNodes.length === 0) {
+      // Try with namespace
+      const nsRelNodes = relsDoc.getElementsByTagNameNS('*', 'Relationship');
+      for (const rel of nsRelNodes) {
+        rels[rel.getAttribute('Id')] = rel.getAttribute('Target');
+      }
+    } else {
+      relNodes.forEach(rel => {
+        rels[rel.getAttribute('Id')] = rel.getAttribute('Target');
+      });
+    }
+
+    const slideFiles = [];
+    for (const node of sldIdNodes) {
+      const rId = node.getAttribute('r:id') ||
+        node.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+      if (rId && rels[rId]) {
+        const target = rels[rId];
+        const fullPath = target.startsWith('/') ? target.slice(1) : 'ppt/' + target;
+        if (zip.file(fullPath)) {
+          slideFiles.push(fullPath);
+        }
+      }
+    }
+
+    return slideFiles.length > 0 ? slideFiles : findSlidesByFilename();
+  } catch (e) {
+    console.warn('Error parsing presentation.xml:', e);
+    return findSlidesByFilename();
+  }
 }
 
 async function extractSlideContent(zip, slidePath, mediaFiles) {
@@ -322,75 +367,95 @@ async function extractSlideContent(zip, slidePath, mediaFiles) {
 
   let imageRels = {};
   if (relsFile) {
-    const relsText = await relsFile.async('text');
-    const relsDoc = parser.parseFromString(relsText, 'application/xml');
-    relsDoc.querySelectorAll('Relationship').forEach(rel => {
-      const type = rel.getAttribute('Type') || '';
-      if (type.includes('image')) {
-        const target = rel.getAttribute('Target');
-        const filename = target.split('/').pop();
-        imageRels[rel.getAttribute('Id')] = filename;
+    try {
+      const relsText = await relsFile.async('text');
+      const relsDoc = parser.parseFromString(relsText, 'application/xml');
+      let relNodes = relsDoc.querySelectorAll('Relationship');
+      if (relNodes.length === 0) {
+        relNodes = relsDoc.getElementsByTagNameNS('*', 'Relationship');
       }
-    });
+      for (const rel of relNodes) {
+        const type = rel.getAttribute('Type') || '';
+        if (type.includes('image')) {
+          const target = rel.getAttribute('Target');
+          const filename = target.split('/').pop();
+          imageRels[rel.getAttribute('Id')] = filename;
+        }
+      }
+    } catch (e) {
+      console.warn('Error parsing slide rels:', e);
+    }
   }
 
-  // Extract text content
+  // Extract all text content using getElementsByTagNameNS for robust namespace handling
   const texts = [];
-  const allTextNodes = doc.querySelectorAll('t');
-  allTextNodes.forEach(t => {
-    const content = t.textContent.trim();
-    if (content) texts.push(content);
-  });
+  const allTextNodes = doc.getElementsByTagNameNS('http://schemas.openxmlformats.org/drawingml/2006/main', 't');
+  if (allTextNodes.length === 0) {
+    // Fallback: try without namespace
+    const fallbackNodes = doc.querySelectorAll('t');
+    for (const t of fallbackNodes) {
+      const content = t.textContent.trim();
+      if (content) texts.push(content);
+    }
+  } else {
+    for (const t of allTextNodes) {
+      const content = t.textContent.trim();
+      if (content) texts.push(content);
+    }
+  }
 
-  // Extract title (usually the first sp with a p:ph type="title" or "ctrTitle")
+  // Try to identify title vs body text
   let title = '';
   let bodyTexts = [];
 
   const spNodes = doc.getElementsByTagNameNS('*', 'sp');
   for (const sp of spNodes) {
-    const nvSpPr = sp.getElementsByTagNameNS('*', 'nvSpPr')[0];
-    if (nvSpPr) {
-      const ph = nvSpPr.querySelector('[type]') ||
-                 sp.querySelector('[type="title"]') ||
-                 sp.querySelector('[type="ctrTitle"]');
-      
-      const phElem = sp.querySelectorAll('*');
-      let isTitle = false;
-      for (const el of phElem) {
-        const type = el.getAttribute('type');
-        if (type === 'title' || type === 'ctrTitle') {
-          isTitle = true;
-          break;
-        }
+    // Check for placeholder type to identify title shapes
+    let isTitle = false;
+    const phNodes = sp.getElementsByTagNameNS('*', 'ph');
+    for (const ph of phNodes) {
+      const type = ph.getAttribute('type');
+      if (type === 'title' || type === 'ctrTitle') {
+        isTitle = true;
+        break;
       }
+    }
 
-      const spTexts = [];
-      sp.querySelectorAll('t').forEach(t => {
-        if (t.textContent.trim()) spTexts.push(t.textContent.trim());
-      });
+    // Get text from this shape
+    const spTexts = [];
+    const tNodes = sp.getElementsByTagNameNS('http://schemas.openxmlformats.org/drawingml/2006/main', 't');
+    const fallbackTNodes = tNodes.length > 0 ? tNodes : sp.querySelectorAll('t');
+    for (const t of fallbackTNodes) {
+      if (t.textContent.trim()) spTexts.push(t.textContent.trim());
+    }
 
-      if (isTitle && spTexts.length > 0) {
-        title = spTexts.join(' ');
-      } else if (spTexts.length > 0) {
-        bodyTexts.push(spTexts.join(' '));
-      }
+    if (isTitle && spTexts.length > 0 && !title) {
+      title = spTexts.join(' ');
+    } else if (spTexts.length > 0) {
+      bodyTexts.push(spTexts.join(' '));
     }
   }
 
+  // If we couldn't identify title from placeholders, use first text
   if (!title && texts.length > 0) {
     title = texts[0];
     bodyTexts = texts.slice(1);
   }
 
-  // Find the best image for this slide
-  let slideImage = null;
-  const imageRelIds = Object.keys(imageRels);
-  if (imageRelIds.length > 0) {
-    const firstImageFilename = imageRels[imageRelIds[0]];
-    if (mediaFiles[firstImageFilename]) {
-      slideImage = await blobUrlToDataUrl(mediaFiles[firstImageFilename]);
+  // Collect all images for this slide
+  let slideImages = [];
+  for (const [relId, filename] of Object.entries(imageRels)) {
+    if (mediaFiles[filename]) {
+      try {
+        const imgData = await blobUrlToDataUrl(mediaFiles[filename]);
+        slideImages.push(imgData);
+      } catch (e) {
+        console.warn('Could not convert image:', filename, e);
+      }
     }
   }
+
+  const slideImage = slideImages.length > 0 ? slideImages[0] : null;
 
   // If we have an image but no text, just use the image
   if (slideImage && !title && bodyTexts.length === 0) {
@@ -409,7 +474,7 @@ async function extractSlideContent(zip, slidePath, mediaFiles) {
     };
   }
 
-  // If we truly have nothing, return null
+  // Image only
   if (slideImage) {
     return { type: 'image', data: slideImage };
   }
@@ -680,9 +745,9 @@ function hideControls() {
 // ===== Fullscreen =====
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => {});
+    document.documentElement.requestFullscreen().catch(() => { });
   } else {
-    document.exitFullscreen().catch(() => {});
+    document.exitFullscreen().catch(() => { });
   }
 }
 
