@@ -732,18 +732,22 @@ function updatePlayPauseIcon() {
 
 // ===== Screen Management =====
 function switchScreen(screen) {
-  dom.loginScreen.classList.toggle('active', screen === 'login');
-  dom.uploadScreen.classList.toggle('active', screen === 'upload');
-  dom.slideshowScreen.classList.toggle('active', screen === 'slideshow');
+  console.log("Switching to screen:", screen);
+  if (dom.loginScreen) dom.loginScreen.classList.toggle('active', screen === 'login');
+  if (dom.uploadScreen) dom.uploadScreen.classList.toggle('active', screen === 'upload');
+  if (dom.slideshowScreen) dom.slideshowScreen.classList.toggle('active', screen === 'slideshow');
 }
 
 // ===== Authentication =====
 function handleLogin() {
+  console.log("Login attempt...");
   const password = dom.loginPassword.value;
   if (password === ACCESS_CODE) {
+    console.log("Access code correct. Transitioning to upload screen.");
     dom.loginError.classList.add('hidden');
     switchScreen('upload');
   } else {
+    console.log("Incorrect access code.");
     dom.loginError.classList.remove('hidden');
     // Re-trigger shake animation
     dom.loginError.style.animation = 'none';
@@ -931,26 +935,43 @@ function applySettingsToUI() {
 
 // ===== Init =====
 async function init() {
-  cacheDom();
-  loadSettings();
-  applySettingsToUI();
-  bindEvents();
-
-  // Login events
-  dom.btnLogin.addEventListener('click', handleLogin);
-  dom.loginPassword.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleLogin();
-  });
-
-  // Load existing slides from IndexedDB
+  console.log("Initializing app...");
   try {
-    const saved = await loadSlides();
-    if (saved && saved.length > 0) {
-      state.slides = saved;
-      updateExistingUI();
+    cacheDom();
+
+    // Attach login events as early as possible
+    if (dom.btnLogin && dom.loginPassword) {
+      dom.btnLogin.addEventListener('click', handleLogin);
+      dom.loginPassword.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+      });
+      console.log("Login events attached.");
+    } else {
+      console.warn("Login elements not found in DOM.");
     }
-  } catch (e) {
-    console.warn('Could not load saved slides:', e);
+
+    // Wrap other initialization in try-catch to be robust
+    try { loadSettings(); } catch (e) { console.warn("loadSettings failed:", e); }
+    try { applySettingsToUI(); } catch (e) { console.warn("applySettingsToUI failed:", e); }
+    try { bindEvents(); } catch (e) { console.error("bindEvents failed:", e); }
+
+    // Ensure we start at login if it exists
+    if (dom.loginScreen) {
+      switchScreen('login');
+    }
+
+    // Load existing slides from IndexedDB
+    try {
+      const saved = await loadSlides();
+      if (saved && saved.length > 0) {
+        state.slides = saved;
+        updateExistingUI();
+      }
+    } catch (e) {
+      console.warn('Could not load saved slides:', e);
+    }
+  } catch (criticalError) {
+    console.error("Critical initialization error:", criticalError);
   }
 }
 
