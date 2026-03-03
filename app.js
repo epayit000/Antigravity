@@ -1,13 +1,14 @@
 /**
- * SlideKiosk — Continuous PowerPoint Presentation Display
+ * epay IT — Presentation Display
  * Parses PPTX files client-side, extracts slide content, and plays them in a loop.
  */
 
 // ===== Constants =====
-const DB_NAME = 'SlideKioskDB';
+const DB_NAME = 'epayITDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'slides';
-const SETTINGS_KEY = 'slidekiosk_settings';
+const SETTINGS_KEY = 'epayit_settings';
+const ACCESS_CODE = '121314';
 
 // ===== State =====
 const state = {
@@ -31,6 +32,12 @@ const state = {
 const dom = {};
 
 function cacheDom() {
+  // Login
+  dom.loginScreen = document.getElementById('login-screen');
+  dom.loginPassword = document.getElementById('login-password');
+  dom.loginError = document.getElementById('login-error');
+  dom.btnLogin = document.getElementById('btn-login');
+  // Upload
   dom.uploadScreen = document.getElementById('upload-screen');
   dom.slideshowScreen = document.getElementById('slideshow-screen');
   dom.dropZone = document.getElementById('drop-zone');
@@ -725,8 +732,26 @@ function updatePlayPauseIcon() {
 
 // ===== Screen Management =====
 function switchScreen(screen) {
+  dom.loginScreen.classList.toggle('active', screen === 'login');
   dom.uploadScreen.classList.toggle('active', screen === 'upload');
   dom.slideshowScreen.classList.toggle('active', screen === 'slideshow');
+}
+
+// ===== Authentication =====
+function handleLogin() {
+  const password = dom.loginPassword.value;
+  if (password === ACCESS_CODE) {
+    dom.loginError.classList.add('hidden');
+    switchScreen('upload');
+  } else {
+    dom.loginError.classList.remove('hidden');
+    // Re-trigger shake animation
+    dom.loginError.style.animation = 'none';
+    void dom.loginError.offsetHeight;
+    dom.loginError.style.animation = '';
+    dom.loginPassword.value = '';
+    dom.loginPassword.focus();
+  }
 }
 
 // ===== Controls Visibility =====
@@ -910,6 +935,12 @@ async function init() {
   loadSettings();
   applySettingsToUI();
   bindEvents();
+
+  // Login events
+  dom.btnLogin.addEventListener('click', handleLogin);
+  dom.loginPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLogin();
+  });
 
   // Load existing slides from IndexedDB
   try {
